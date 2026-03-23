@@ -1,50 +1,41 @@
-let isEngineReady = false;
+let compiler;
 
-async function initEngine() {
-    const loadBtn = document.getElementById('loadBtn');
-    const loadStatus = document.getElementById('loadStatus');
+async function setupLocalEngine() {
+    const btn = document.getElementById('loadBtn');
+    const status = document.getElementById('loadStatus');
     const runBtn = document.getElementById('runBtn');
 
-    loadBtn.disabled = true;
-    loadBtn.innerText = "جاري المحاولة...";
-    loadStatus.innerText = "جاري محاولة الاتصال المباشر...";
+    btn.disabled = true;
+    btn.innerText = "جاري التحميل...";
+    status.innerText = "يتم الآن تحميل المترجم بداخل متصفحك...";
 
     try {
-        // نستخدم رابط مباشر ومختلف للمحرك (CDN) لضمان عدم الحظر
-        const testReq = await fetch('https://wasmer.sh/api/run/cpp', { 
-            method: 'OPTIONS' // فحص أولي بسيط
-        });
+        // نستخدم CppIt وهو محرك WASM خفيف جداً ومستقر
+        compiler = new CppIt();
+        await compiler.init();
         
-        isEngineReady = true;
-        loadStatus.innerText = "✅ المحرك جاهز للعمل!";
-        loadStatus.style.color = "#28a745";
-        loadBtn.style.display = "none";
+        status.innerText = "✅ المحرك جاهز تماماً!";
+        status.style.color = "#2ecc71";
+        btn.style.display = "none";
         runBtn.disabled = false;
-        runBtn.style.background = "#007acc";
+        runBtn.style.background = "#27ae60";
         runBtn.style.cursor = "pointer";
-        runBtn.innerText = "تشغيل المصنع (Run)";
-
     } catch (err) {
-        loadStatus.innerText = "❌ فشل التحميل. الشبكة تمنع الاتصال بالمحرك.";
-        loadBtn.disabled = false;
-        loadBtn.innerText = "إعادة المحاولة";
-        console.error("Connection Error:", err);
+        status.innerText = "❌ فشل التحميل. جرب VPN لمرة واحدة فقط.";
+        btn.disabled = false;
+        btn.innerText = "إعادة محاولة";
     }
 }
 
-async function runCodeLocally() {
+async function runLocally() {
     const code = document.getElementById('cppInput').value;
     const outputDiv = document.getElementById('outputConsole');
-    outputDiv.innerText = "جاري المعالجة...";
+    outputDiv.innerText = "Running code locally...";
 
     try {
-        const response = await fetch('https://wasmer.sh/api/run/cpp', {
-            method: 'POST',
-            body: code
-        });
-        const result = await response.text();
-        outputDiv.innerText = result || "تم التنفيذ.";
-    } catch (e) {
-        outputDiv.innerText = "عذراً: المحرك لا يستجيب في منطقتك حالياً.";
+        const result = await compiler.run(code);
+        outputDiv.innerText = result.stdout || result.stderr || "Done.";
+    } catch (err) {
+        outputDiv.innerText = "خطأ أثناء التنفيذ: " + err;
     }
 }
