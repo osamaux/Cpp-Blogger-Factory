@@ -1,3 +1,32 @@
-/* JSCPP Engine v2.0.4 - Embedded Version */
-!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.JSCPP=t():e.JSCPP=t()}(this,function(){return function(e){function t(n){if(r[n])return r[n].exports;var o=r[n]={exports:{},id:n,loaded:!1};return e[n].call(o.exports,o,o.exports,t),o.loaded=!0,o.exports}var r={};return t.m=e,t.c=r,t.p="",t(0)}([function(e,t,r){"use strict";var n=r(1),o=r(46),i=r(47),a={run:function(e,t,r){var a=new n(r);a.setSource(e);var u=a.tokenize(),s=a.parse(u),l=a.interpret(s,t);return l},tokenize:function(e){var t=new n;return t.setSource(e),t.tokenize()},parse:function(e){var t=new n;return t.parse(e)},interpret:function(e,t,r){var a=new n(r);return a.interpret(e,t)},debugger:function(e,t,r){var a=new n(r);return a.setSource(e),new o(a,t)},includes:i};e.exports=a}])});
-/* تم اختصار الكود هنا لسهولة النسخ، لكن في ملفك سيتم تشغيله كـ Interpreter */
+// مصنع أسامة الصغير - المحرك الداخلي (No-Network Engine)
+const JSCPP = {
+    run: function(code, input, config) {
+        let output = "";
+        
+        // تنظيف الكود من التعليقات والفراغات
+        let lines = code.split('\n');
+        
+        lines.forEach(line => {
+            // معالجة أمر cout
+            if (line.includes("cout <<")) {
+                // استخراج النصوص بين علامات التنصيص
+                let matches = line.match(/"([^"]+)"/g);
+                if (matches) {
+                    matches.forEach(m => {
+                        output += m.replace(/"/g, "");
+                    });
+                }
+                // معالجة endl (سطر جديد)
+                if (line.includes("endl")) {
+                    output += "\n";
+                }
+            }
+        });
+
+        // إرسال النتيجة للكونسول
+        if (config && config.stdio && config.stdio.write) {
+            config.stdio.write(output);
+        }
+        return 0;
+    }
+};
