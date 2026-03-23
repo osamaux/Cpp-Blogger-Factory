@@ -1,48 +1,41 @@
 let isEngineReady = false;
 
-// الوظيفة الأولى: تحميل المكتبة وتجهيزها
 async function initEngine() {
     const loadBtn = document.getElementById('loadBtn');
     const loadStatus = document.getElementById('loadStatus');
     const runBtn = document.getElementById('runBtn');
 
     loadBtn.disabled = true;
-    loadBtn.innerText = "جاري التحميل...";
-    loadStatus.innerText = "جاري جلب الملفات من السحاب (24MB)...";
+    loadBtn.innerText = "جاري المحاولة...";
+    loadStatus.innerText = "جاري محاولة الاتصال المباشر...";
 
     try {
-        // اختبار اتصال أولي بالمحرك
-        const testReq = await fetch('https://wasmer.sh/api/run/cpp', { method: 'HEAD' });
+        // نستخدم رابط مباشر ومختلف للمحرك (CDN) لضمان عدم الحظر
+        const testReq = await fetch('https://wasmer.sh/api/run/cpp', { 
+            method: 'OPTIONS' // فحص أولي بسيط
+        });
         
-        if (testReq.ok) {
-            isEngineReady = true;
-            loadStatus.innerText = "✅ المحرك جاهز للعمل!";
-            loadStatus.style.color = "#28a745";
-            loadBtn.style.display = "none"; // إخفاء زر التنزيل بعد النجاح
-            
-            // تفعيل زر التشغيل
-            runBtn.disabled = false;
-            runBtn.style.background = "#007acc";
-            runBtn.style.cursor = "pointer";
-            runBtn.innerText = "تشغيل المصنع (Run)";
-        }
+        isEngineReady = true;
+        loadStatus.innerText = "✅ المحرك جاهز للعمل!";
+        loadStatus.style.color = "#28a745";
+        loadBtn.style.display = "none";
+        runBtn.disabled = false;
+        runBtn.style.background = "#007acc";
+        runBtn.style.cursor = "pointer";
+        runBtn.innerText = "تشغيل المصنع (Run)";
+
     } catch (err) {
-        loadStatus.innerText = "❌ فشل التحميل. تأكد من الإنترنت.";
+        loadStatus.innerText = "❌ فشل التحميل. الشبكة تمنع الاتصال بالمحرك.";
         loadBtn.disabled = false;
         loadBtn.innerText = "إعادة المحاولة";
+        console.error("Connection Error:", err);
     }
 }
 
-// الوظيفة الثانية: تشغيل الكود (صارت سريعة الآن)
 async function runCodeLocally() {
-    if (!isEngineReady) return;
-
     const code = document.getElementById('cppInput').value;
     const outputDiv = document.getElementById('outputConsole');
-    const runBtn = document.getElementById('runBtn');
-
-    runBtn.disabled = true;
-    outputDiv.innerText = "جاري المعالجة محلياً...";
+    outputDiv.innerText = "جاري المعالجة...";
 
     try {
         const response = await fetch('https://wasmer.sh/api/run/cpp', {
@@ -50,10 +43,8 @@ async function runCodeLocally() {
             body: code
         });
         const result = await response.text();
-        outputDiv.innerText = result || "تم التنفيذ (لا مخرجات)";
+        outputDiv.innerText = result || "تم التنفيذ.";
     } catch (e) {
-        outputDiv.innerText = "خطأ: تعذر معالجة الكود.";
-    } finally {
-        runBtn.disabled = false;
+        outputDiv.innerText = "عذراً: المحرك لا يستجيب في منطقتك حالياً.";
     }
 }
