@@ -2,34 +2,32 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>Osama Local Factory - WASM</title>
+    <title>Osama Local C++ Engine</title>
     <link rel="stylesheet" href="factory.css">
-    <script src="https://cdn.jsdelivr.net/npm/wasmer-js@0.12.0/dist/wasmer.all.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cpp-it/dist/cpp-it.min.js"></script>
 </head>
 <body style="background: #1e1e1e; color: white; padding: 20px; direction: rtl;">
 
     <div id="factory-app">
-        <div class="header">⚙️ مصنع أسامة المستقل (v2.0)</div>
+        <div class="header">🏗️ مصنع أسامة المستقل (Local Engine)</div>
         
         <div id="setup-section" style="background: #2d2d2d; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #444;">
-            <p style="margin: 0 0 10px 0; font-size: 0.9em;">خطوة أولى: يجب تحميل محرك التشغيل (24MB) لمرة واحدة:</p>
-            <button id="loadBtn" onclick="initEngine()" style="background: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px;">تنزيل وتجهيز المكتبة 📥</button>
-            <span id="loadStatus" style="margin-right: 15px; font-size: 0.8em; color: #aaa;">المحرك غير جاهز</span>
+            <p style="margin: 0 0 10px 0; font-size: 0.9em;">تجهيز المحرك الداخلي (مرة واحدة):</p>
+            <button id="loadBtn" onclick="setupLocalEngine()" style="background: #e67e22; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold;">تحميل المحرك المحلي 📥</button>
+            <span id="loadStatus" style="margin-right: 15px; font-size: 0.8em; color: #aaa;">غير جاهز</span>
         </div>
 
-        <textarea id="cppInput" spellcheck="false" style="width:100%; height:280px; background:#252526; color:#d4d4d4; font-family:monospace; padding:10px; border:1px solid #333; direction:ltr; text-align: left;">
+        <textarea id="cppInput" style="width:100%; height:250px; background:#252526; color:#fff; font-family:monospace; padding:10px; direction:ltr; text-align: left;">
 #include <iostream>
-using namespace std;
-
 int main() {
-    cout << "أهلاً بك في المصنع المحلي!" << endl;
+    std::cout << "Success! Running 100% Locally." << std::endl;
     return 0;
 }
         </textarea>
 
-        <button id="runBtn" onclick="runCodeLocally()" disabled style="width:100%; padding:15px; background:#555; color:white; border:none; cursor:not-allowed; margin-top:15px; font-weight:bold;">تشغيل (يجب تجهيز المكتبة أولاً)</button>
+        <button id="runBtn" onclick="runLocally()" disabled style="width:100%; padding:15px; background:#444; color:white; border:none; cursor:not-allowed; margin-top:15px; font-weight:bold;">تشغيل (Run)</button>
 
-        <div id="outputConsole" style="background:#000; color:#4ec9b0; padding:15px; margin-top:15px; min-height:80px; border-radius:5px; font-family:monospace; white-space: pre-wrap;">المخرجات ستظهر هنا...</div>
+        <div id="outputConsole" style="background:#000; color:#4ec9b0; padding:15px; margin-top:15px; min-height:80px; border-radius:5px; font-family:monospace; white-space: pre-wrap;">المخرجات...</div>
     </div>
 
     <script src="factory.js"></script>
