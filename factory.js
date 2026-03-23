@@ -1,41 +1,26 @@
-let compiler;
-
-async function setupLocalEngine() {
-    const btn = document.getElementById('loadBtn');
-    const status = document.getElementById('loadStatus');
-    const runBtn = document.getElementById('runBtn');
-
-    btn.disabled = true;
-    btn.innerText = "جاري التحميل...";
-    status.innerText = "يتم الآن تحميل المترجم بداخل متصفحك...";
-
-    try {
-        // نستخدم CppIt وهو محرك WASM خفيف جداً ومستقر
-        compiler = new CppIt();
-        await compiler.init();
-        
-        status.innerText = "✅ المحرك جاهز تماماً!";
-        status.style.color = "#2ecc71";
-        btn.style.display = "none";
-        runBtn.disabled = false;
-        runBtn.style.background = "#27ae60";
-        runBtn.style.cursor = "pointer";
-    } catch (err) {
-        status.innerText = "❌ فشل التحميل. جرب VPN لمرة واحدة فقط.";
-        btn.disabled = false;
-        btn.innerText = "إعادة محاولة";
-    }
-}
-
-async function runLocally() {
+function runCodeNow() {
     const code = document.getElementById('cppInput').value;
     const outputDiv = document.getElementById('outputConsole');
-    outputDiv.innerText = "Running code locally...";
+    outputDiv.innerText = "جاري المعالجة محلياً...";
+    outputDiv.style.color = "#4ec9b0";
 
     try {
-        const result = await compiler.run(code);
-        outputDiv.innerText = result.stdout || result.stderr || "Done.";
+        // استخدام مكتبة JSCPP المدمجة
+        let output = "";
+        const config = {
+            stdio: {
+                write: function (s) {
+                    output += s;
+                }
+            }
+        };
+
+        // تشغيل الكود
+        const exitCode = JSCPP.run(code, "", config);
+        
+        outputDiv.innerText = output || "تم التنفيذ بنجاح.";
     } catch (err) {
-        outputDiv.innerText = "خطأ أثناء التنفيذ: " + err;
+        outputDiv.innerText = "خطأ في الكود: " + err;
+        outputDiv.style.color = "#f44747";
     }
 }
